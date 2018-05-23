@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="canvas" width="375" height="400" @mousedown="onMouseDown" @mouseup="onMouseUp"></canvas>
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/ball.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            canvas: null,
+            x0: 100,
+            y0: 200,
+            x2: 300,
+            y2: 200,
+            angle: 0
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.canvas = document.getElementById('canvas');
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+            // this.drawFrame();
+        },
+        methods: {
+            onMouseMove: function () {
+                this.drawQC();
+            },
+            onMouseDown: function () {
+                this.drawQC();
+                this.canvas.addEventListener('mousemove', this.onMouseMove)
+            },
+            onMouseUp: function () {
+                this.canvas.removeEventListener('mousemove', this.onMouseMove)
+            },
+            drawFrame: function () {
+                var that = this;
+                that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                that.context.beginPath();
+                that.context.moveTo(that.x0, that.y0);
+                that.context.quadraticCurveTo(that.x0 + (that.x2 - that.x0) / 2, that.y2 - that.y2*Math.sin(that.angle), that.x2, that.y2);
+                that.context.stroke();
+                that.angle += .1;
+                window.requestAnimationFrame(that.drawFrame)
+            },
+            drawQC: function () {
+                // 控制点为鼠标点
+                // this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                // this.context.beginPath();
+                // this.context.moveTo(this.x0, this.y0);
+                // this.context.quadraticCurveTo(this.mouse.x, this.mouse.y, this.x2, this.y2);
+                // this.context.stroke();
+
+                // 穿过鼠标点
+                this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                var x = this.mouse.x * 2 - (this.x0 + this.x2) / 2;
+                var y = this.mouse.y * 2 - (this.y0 + this.y2) / 2;
+                this.context.beginPath();
+                this.context.moveTo(this.x0, this.y0);
+                this.context.quadraticCurveTo(x, y, this.x2, this.y2);
+                this.context.stroke();
+            }
+        }
+    })
+</script>
+</body>
+</html>

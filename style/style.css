@@ -1,0 +1,12 @@
+*{
+    margin:0;
+}
+#canvas{
+    display: block;
+    margin:auto;
+    border:1px solid black;
+    /* background:black; */
+}
+#app {
+    text-align: center;
+}

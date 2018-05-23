@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="canvas" width="375" height="400" @click="onClick"></canvas>
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/ball.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            canvas: null,
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.canvas = document.getElementById('canvas');
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+        },
+        methods: {
+            onClick: function () {
+                var gradient = this.context.createLinearGradient(0,0,200,200);
+                gradient.addColorStop(0, '#000');
+                // gradient.addColorStop(.5, '#00f');
+                gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                var gradient2 = this.context.createLinearGradient(0, 200, 200, 400);
+                gradient2.addColorStop(0, '#000');
+                // gradient.addColorStop(.5, '#00f');
+                gradient2.addColorStop(1, '#fff');
+                this.context.fillStyle = gradient;
+                this.context.fillRect(0,0,200,200);
+
+                // this.context.fillStyle = gradient2;
+                // this.context.fillRect(0,200,200,400)
+
+                var c1 = {x: 300, y:300, radius: 0},
+                    c2 = {x:300, y:300, radius: 50};
+                    gradient3  = this.context.createRadialGradient(c1.x, c1.y, c1.radius, c2.x, c2.y, c2.radius);
+                    gradient3.addColorStop(0, '#000');
+                    gradient3.addColorStop(1, '#f30');
+                    this.context.fillStyle = gradient3;
+                    this.context.arc(300, 300, 100, 0, 2*Math.PI);
+                    this.context.fill();
+            },
+        }
+    })
+</script>
+</body>
+</html>

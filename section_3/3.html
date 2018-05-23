@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <canvas id="canvas" width="375" height="400"></canvas>
+    <div id="app">
+        {{ date.hour }} : {{ ('0' + date.minutes).substr(-2) }} : {{ ('0' + date.seconds).substr(-2) }}
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/ball.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+           canvas: document.getElementById('canvas'),
+           log: '',
+           mouse: {},
+           date: {
+               hour: 0,
+               minutes: 0,
+               seconds: 0
+           },
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.mouse = utils.captureMouse(this.canvas);
+            this.date.hour = new Date().getHours();
+            this.date.minutes = new Date().getMinutes();
+            this.date.seconds = new Date().getSeconds();
+            this.drawFrame2();
+        },
+        methods: {
+            drawFrame1: function () {
+                this.date.hour = new Date().getHours();
+                this.date.minutes = new Date().getMinutes();
+                this.date.seconds = new Date().getSeconds();
+            },
+            drawFrame2: function () {
+                var that = this;
+                that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                var hourX = hourY = 0;
+                var hourA = 0;
+                that.context.save();
+                that.context.translate(200,200);
+                that.context.rotate(-Math.PI/2)
+
+                for (let i = 0; i < 60; i++) {
+                    that.context.beginPath();
+                    that.context.moveTo(0, 0);
+                    hourA = i / 30 * Math.PI;
+                    hourX = 100 * Math.cos(hourA);
+                    hourY = 100 * Math.sin(hourA);
+                    that.context.lineTo(hourX, hourY);
+                    that.context.closePath();
+                    that.context.stroke();
+                }
+                that.context.fillStyle = 'white';
+                that.context.arc(0,0,90,0,2*Math.PI,false);
+                that.context.fill();
+                for (let i = 0; i < 12; i++) {
+                    that.context.beginPath();
+                    that.context.moveTo(0, 0);
+                    hourA = i / 6 * Math.PI;
+                    hourX = 100 * Math.cos(hourA);
+                    hourY = 100 * Math.sin(hourA);
+                    that.context.lineTo(hourX, hourY);
+                    that.context.closePath();
+                    that.context.stroke();
+                }
+                that.context.arc(0, 0, 80, 0, 2 * Math.PI, false);
+                that.context.fill();
+                
+                that.context.beginPath();
+                that.context.fillStyle = 'black';
+                that.context.arc(0,0,4,0, 2*Math.PI,false);
+                that.context.closePath();
+                that.context.fill();
+
+                that.context.beginPath();
+                that.context.strokeStyle = 'red';
+                that.context.moveTo(0, 0);
+                hourA = (that.date.hour - 12)/6*Math.PI;
+                hourX = 55 * Math.cos(hourA);
+                hourY = 55 * Math.sin(hourA);
+                that.context.lineTo(hourX, hourY);
+                that.context.closePath();
+                that.context.stroke();
+
+                that.context.beginPath();
+                that.context.strokeStyle = 'green';
+                that.context.moveTo(0, 0);
+                hourA = that.date.minutes / 30 * Math.PI;
+                hourX = 75 * Math.cos(hourA);
+                hourY = 75 * Math.sin(hourA);
+                that.context.lineTo(hourX, hourY);
+                that.context.closePath();
+                that.context.stroke();
+
+                that.context.beginPath();
+                that.context.strokeStyle = 'blue';
+                that.context.moveTo(0, 0);
+                hourA = that.date.seconds / 30 * Math.PI;
+                hourX = 90 * Math.cos(hourA);
+                hourY = 90 * Math.sin(hourA);
+                that.context.lineTo(hourX, hourY);
+                that.context.closePath();
+                that.context.stroke();
+
+                that.drawFrame1();
+                that.context.restore();
+                window.requestAnimationFrame(that.drawFrame2, that.canvas);
+            }
+        }
+    })
+</script>
+</body>
+</html>

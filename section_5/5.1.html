@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="canvas" width="375" height="400"></canvas>
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/ball.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            ball: new Ball(),
+            canvas: null,
+            vx: 0,
+            vy: 0,
+            angle: 40,
+            speed: 10
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.canvas = document.getElementById('canvas');
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+            this.ball.x = this.ball.y = this.ball.radius;
+            this.vx = Math.cos(this.angle*Math.PI / 180) * this.speed;
+            this.vy = Math.sin(this.angle*Math.PI / 180) * this.speed;
+            this.drawFrame();
+        },
+        methods: {
+            drawFrame: function () {
+                // 单轴/双轴 速度向量
+                // this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                // if (this.ball.x > this.canvasWidth - this.ball.radius || this.ball.x < this.ball.radius) {
+                //     this.vx = -this.vx;
+                // }
+                // if (this.ball.y > this.canvasHeight - this.ball.radius || this.ball.y < this.ball.radius) {
+                //     this.vy = -this.vy;
+                // }
+                // this.ball.x += this.vx;
+                // this.ball.y += this.vy;
+                // this.ball.draw(this.context);
+                // window.requestAnimationFrame(this.drawFrame);
+
+                /*  角速度
+                *   vx = Math.cos(angle) * speed
+                *   vy = Math.sin(angle) * speed
+                */
+                this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                if (this.ball.x > this.canvasWidth - this.ball.radius || this.ball.x < this.ball.radius) {
+                    this.vx = -this.vx;
+                }
+                if (this.ball.y > this.canvasHeight - this.ball.radius || this.ball.y < this.ball.radius) {
+                    this.vy = -this.vy;
+                }
+                this.ball.x += this.vx;
+                this.ball.y += this.vy;
+
+                this.ball.draw(this.context);
+                window.requestAnimationFrame(this.drawFrame);
+            }
+        }
+    })
+</script>
+</body>
+</html>

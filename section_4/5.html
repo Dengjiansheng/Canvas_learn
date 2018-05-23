@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="referrer" content="never">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+
+<body>
+    <div id="app">
+        <canvas id="canvas" width="375" height="400" @mousedown="onMouseDown" @mouseup="onMouseUp"></canvas>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+        <P>red: {{ posData.red }}
+            <br> green: {{ posData.green }}
+            <br> blue: {{ posData.blue }}
+            <br> alpha: {{ posData.alpha }}</P>
+    </div>
+    <script src="../Javascript/utils.js"></script>
+    <script src="../Javascript/ball.js"></script>
+    <script src="../Javascript/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                touch: {},
+                mouse: {},
+                canvas: null,
+                img: null,
+                imgData: null,
+                pixels: null,
+                posData: {
+                    red: 0,
+                    green: 0,
+                    blur: 0,
+                    alpha: 0,
+                },
+                brush_size: 10,
+                brush_density: 20,
+                brush_color: null,
+            },
+            computed: {
+                context: function () {
+                    return this.canvas.getContext('2d');
+                },
+                canvasWidth: function () {
+                    return this.canvas.width;
+                },
+                canvasHeight: function () {
+                    return this.canvas.height;
+                },
+            },
+            mounted: function () {
+                this.canvas = document.getElementById('canvas');
+                this.touch = utils.captureTouch(canvas);
+                this.mouse = utils.captureMouse(canvas);
+
+                this.imgData = this.context.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+                this.pixels = this.imgData.data;
+            },
+            methods: {
+                onMouseMove: function () {
+                    for (let i = 0; i < this.brush_density; i++) {
+                        let angle = Math.random() * Math.PI * 2,
+                            radius = Math.random() * this.brush_size,
+                            xpos = (this.mouse.x + Math.cos(angle) * radius) | 0,
+                            ypos = (this.mouse.y + Math.sin(angle) * radius) | 0,
+                            offset = (xpos + ypos * this.imgData.width) * 4;
+
+                        this.pixels[offset] = this.brush_color >> 16 & 0xff;
+                        this.pixels[offset + 1] = this.brush_color >> 8 & 0xff;
+                        this.pixels[offset + 2] = this.brush_color & 0xff;
+                        this.pixels[offset + 3] = 255;
+                    }
+                    this.context.putImageData(this.imgData, 0, 0)
+                },
+                onMouseDown: function () {
+                    this.brush_color = utils.parseColor(Math.random() * 0xffffff, true);
+                    this.canvas.addEventListener('mousemove', this.onMouseMove)
+                },
+                onMouseUp: function () {
+                    this.canvas.removeEventListener('mousemove', this.onMouseMove)
+                },
+                drawImage: function () {
+                    this.img = new Image();
+                    // this.img.src = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1526627274199&di=702b5b2d16d13874efa59e7c7ac55276&imgtype=0&src=http%3A%2F%2Fs13.sinaimg.cn%2Fmw690%2F005LKisygy722sQIwby2c%26690';
+                    this.img.src = '../image/huaji.jpg';
+                    this.img.onload = () => {
+                        this.context.drawImage(this.img, 0, 0, this.img.width, this.img.height, 0, 0, 300, 300 * this.img.height / this.img.width)
+                        // this.context.drawImage(this.img,0,0, this.img.width, this.img.height, 0, 0, 300, 300*this.img.width/this.img.height)
+                        this.imgData = this.context.getImageData(0, 0, 300, 300 * this.img.height / this.img.width);
+                        this.pixels = this.imgData.data;
+
+                    }
+                },
+                drawOtherColorImage: function () {
+                    for (let offset = 0, len = this.pixels.length; offset < len; offset += 4) {
+                        this.pixels[offset + 2] = 0;
+                    }
+                    this.context.putImageData(this.imgData, 0, 0)
+                },
+                drawOldImage: function () {
+                    for (let offset = 0, len = this.pixels.length; offset < len; offset += 4) {
+                        let old = .2126 * this.pixels[offset] + .7152 * this.pixels[offset + 1] + .0722 * this.pixels[offset + 2];
+                        this.pixels[offset] = this.pixels[offset + 1] = this.pixels[offset + 2] = old;
+                    }
+                    this.context.putImageData(this.imgData, 0, 0)
+                },
+                drawLines: function () {
+                    for (let i = 0; i < this.canvasWidth; i += 10) {
+                        for (let j = 0; j < this.canvasHeight; j += 10) {
+                            this.context.fillStyle = i % 20 == 0 ? '#f00' : i % 30 == 0 ? '#0f0' : '#00f';
+                            this.context.fillRect(i, j, 10, 10);
+                        }
+                    }
+
+                    setTimeout(() => {
+                        this.imgData = this.context.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+                        this.pixels = this.imgData.data;
+                        for (let offset = 0, len = this.pixels.length; offset < len; offset += 4) {
+                            this.pixels[offset] = 255 - this.pixels[offset];
+                            this.pixels[offset + 1] = 255 - this.pixels[offset + 1];
+                            this.pixels[offset + 2] = 255 - this.pixels[offset + 2];
+                        }
+                        this.context.putImageData(this.imgData, 0, 0)
+                    }, 3000)
+                },
+                drawFrame: function () {
+                    for (let i = 0; i < this.canvasWidth; i += 10) {
+                        for (var j = 0; j < this.canvasHeight; j += 10) {
+                            this.context.fillStyle = i % 20 == 0 ? '#f00' : i % 30 == 0 ? '#0f0' : '#00f';
+                            this.context.fillRect(i, j, 10, 10);
+                        }
+                    }
+
+                    this.imgData = this.context.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+                    this.pixels = this.imgData.data;
+
+                    for (let y = 0; y < this.imgData.height; y += 1) {
+                        for (let x = 0; x < this.imgData.width; x += 1) {
+                            let dx = x - this.mouse.x,
+                                dy = y - this.mouse.y,
+                                dist = Math.sqrt(dx * dx, dy * dy),
+                                offset = (x + y * this.imgData.width) * 4,
+                                r = this.pixels[offset],
+                                g = this.pixels[offset + 1],
+                                b = this.pixels[offset + 2];
+                            this.pixels[offset] = Math.cos(r * dist * .001) * 256;
+                            this.pixels[offset + 1] = Math.cos(g * dist * .001) * 256;
+                            this.pixels[offset + 2] = Math.cos(b * dist * .001) * 256;
+                        }
+                    }
+                    this.context.putImageData(this.imgData, 0, 0);
+                    window.requestAnimationFrame(this.drawFrame)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

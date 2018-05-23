@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <canvas id="canvas" width="375" height="400"></canvas>
+    <div id="app">
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+        <p>{{ ball.rotation*180/Math.PI }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/ball.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            canvas: document.getElementById('canvas'),
+            ball: new Ball(),
+            angle: 0,
+            angleX: 0,
+            angleY: 0,
+            centerY: 200,
+            centerX: 187.5,
+            centerScale: 1,
+            range: 50,
+            speed: .05,
+            xspeed: 1,
+            yspeed: .05,
+            xpos: 0,
+            ypos: 200,
+            radius: 100,
+            radiusX: 100,
+            radiusY: 60,
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.ball.x = this.canvasWidth / 2;
+            this.ball.y = this.canvasHeight / 2;
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+            this.drawFrame();
+        },
+        methods: {
+            drawFrame: function () {
+                var that = this;
+
+                //  线性垂直运动
+                // that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                // that.ball.y = that.centerY + Math.sin(that.angle) * that.range;
+                // that.ball.draw(that.context);
+                // that.angle += that.speed;
+
+                // 脉冲运动
+                // that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                // that.ball.scaleX = that.ball.scaleY = that.centerScale + Math.sin(that.angle) * that.range;
+                // that.ball.draw(that.context);
+                // that.angle += that.speed;
+
+                // 使用两个角的产生波
+                // that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                // that.ball.x = that.centerX + Math.sin(that.angleX) * that.range;
+                // that.ball.y = that.centerY + Math.sin(that.angleY) * that.range;
+                // that.angleX += that.xspeed;
+                // that.angleY += that.yspeed;
+                // that.ball.draw(that.context);
+
+
+                // 使用绘画api产生的波
+                that.context.beginPath();
+                that.context.moveTo(that.xpos, that.ypos);
+                that.xpos += that.xspeed;
+                that.angle += that.yspeed;
+                that.ypos = that.centerY + Math.sin(that.angle) * that.range;
+                that.context.lineTo(that.xpos, that.ypos);
+                that.context.stroke();
+
+                // 圆周运动
+                // that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                // that.ball.x = that.centerX + Math.cos(that.angle) * that.radiusX;
+                // that.ball.y = that.centerY + Math.sin(that.angle) * that.radiusY;
+                // that.angle += that.speed;
+                // that.ball.draw(that.context);
+
+                window.requestAnimationFrame(that.drawFrame, that.canvas);
+            }
+        }
+    })
+</script>
+</body>
+</html>

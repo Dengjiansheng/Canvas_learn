@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="canvas" width="375" height="400" @mousedown="onMouseDown" @mouseup="onMouseUp"></canvas>
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/ball.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            canvas: null,
+            points: [{ "x": 10.222025216677617, "y": 64.74593814708581 }, { "x": 285.5368230790712, "y": 247.5990775648058 }, { "x": 124.2350207021731, "y": 194.81514718991662 }, { "x": 303.8039644047127, "y": 338.8756975120363 }, { "x": 179.7927313677714, "y": 312.1139457192191 }, { "x": 235.17483981447515, "y": 263.3027652970803 }, { "x": 293.26948206703406, "y": 250.1915695562457 }],
+            angle: 0,
+            numPoints:5,
+            valuePoints: 0,
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.canvas = document.getElementById('canvas');
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+            // for (let i = 0; i < this.numPoints; i++) {
+            //     this.points.push({
+            //         x: Math.random() * this.canvasWidth,
+            //         y: Math.random() * this.canvasHeight
+            //     })
+            // }
+            // this.drawFrame();
+        },
+        methods: {
+            onMouseMove: function () {
+                // this.drawQC();
+            },
+            onMouseDown: function () {
+                this.drawQC();
+                // this.canvas.addEventListener('mousemove', this.onMouseMove)
+            },
+            onMouseUp: function () {
+                // this.canvas.removeEventListener('mousemove', this.onMouseMove)
+            },
+            drawFrame: function () {
+                // var that = this;
+                // window.requestAnimationFrame(that.drawFrame)
+            },
+            drawQC: function () {
+                // 多曲线错误的画法
+                // var that = this;
+                // if (that.valuePoints >= that.points.length-1) {
+                //     return false;
+                // }
+                // that.context.beginPath();
+                // that.context.moveTo(that.points[that.valuePoints].x, that.points[that.valuePoints].y);
+                // that.context.quadraticCurveTo(that.points[that.valuePoints+1].x, that.points[that.valuePoints+1].y, that.points[that.valuePoints + 2].x, that.points[that.valuePoints + 2].y);
+                // that.context.stroke();
+                // that.valuePoints += 2;
+
+                // 多曲线正确画法
+                // var that = this;
+                // that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                // that.context.save();
+                // for (let i = 0; i < that.numPoints; i ++) {
+                //     that.context.beginPath();
+                //     that.context.arc(that.points[i].x, that.points[i].y, (i+1)*2, 0, 2*Math.PI);
+                //     that.context.closePath();
+                //     that.context.fill();
+                // }
+                // that.context.restore();
+                // that.context.save();
+                // for (that.valuePoints = 1; that.valuePoints < that.numPoints - 2; that.valuePoints++) {
+                //     that.context.beginPath();
+                //     that.context.lineWith = 5;
+                //     that.context.strokeStyle = 'tomato';
+                //     that.context.arc((that.points[that.valuePoints].x + that.points[that.valuePoints + 1].x) / 2, (that.points[that.valuePoints].y + that.points[that.valuePoints + 1].y) / 2, 5, 0, 2 * Math.PI);
+                //     that.context.closePath();
+                //     that.context.stroke()
+                // }
+                // that.context.restore();
+                // that.context.beginPath();
+                // that.context.moveTo(that.points[0].x, that.points[0].y);
+                // for (that.valuePoints = 1; that.valuePoints < that.numPoints - 2; that.valuePoints++) {
+                //     that.context.quadraticCurveTo(that.points[that.valuePoints].x, that.points[that.valuePoints].y, (that.points[that.valuePoints].x + that.points[that.valuePoints + 1].x) / 2, (that.points[that.valuePoints].y + that.points[that.valuePoints + 1].y) / 2)    
+                // }
+                // that.context.quadraticCurveTo(that.points[that.valuePoints].x, that.points[that.valuePoints].y, that.points[that.valuePoints + 1].x, that.points[that.valuePoints + 1].y);
+                // that.context.stroke();
+
+                // 闭合曲线正确画法
+                var that = this;
+                that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                that.context.save();
+                for (let i = 0; i < that.numPoints; i++) {
+                    that.context.beginPath();
+                    that.context.arc(that.points[i].x, that.points[i].y, (i + 1) * 2, 0, 2 * Math.PI);
+                    that.context.closePath();
+                    that.context.fill();
+                }
+                that.context.restore();
+                that.context.save();
+                that.context.beginPath();
+                that.context.strokeStyle = 'tomato';
+                that.context.arc((that.points[0].x + that.points[that.numPoints - 1].x) / 2, (that.points[0].y + that.points[that.numPoints - 1].y) / 2, 5, 0, 2 * Math.PI);
+                that.context.closePath();
+                that.context.stroke();                
+                for (that.valuePoints = 0; that.valuePoints < that.numPoints - 1; that.valuePoints++) {
+                    that.context.beginPath();
+                    that.context.arc((that.points[that.valuePoints].x + that.points[that.valuePoints + 1].x) / 2, (that.points[that.valuePoints].y + that.points[that.valuePoints + 1].y) / 2, 5, 0, 2 * Math.PI);
+                    that.context.closePath();
+                    that.context.stroke()
+                }
+                that.context.restore();
+                that.context.beginPath();
+                that.context.strokeStyle = 'tomato';
+                that.context.moveTo((that.points[0].x+that.points[that.numPoints - 1].x)/2, (that.points[0].y+that.points[that.numPoints - 1].y)/2);
+                for (that.valuePoints = 0; that.valuePoints < that.numPoints - 1; that.valuePoints++) {
+                    that.context.quadraticCurveTo(that.points[that.valuePoints].x, that.points[that.valuePoints].y, (that.points[that.valuePoints].x + that.points[that.valuePoints + 1].x) / 2, (that.points[that.valuePoints].y + that.points[that.valuePoints + 1].y) / 2)
+                }
+                that.context.quadraticCurveTo(that.points[that.valuePoints].x, that.points[that.valuePoints].y, (that.points[0].x + that.points[that.numPoints - 1].x) / 2, (that.points[0].y + that.points[that.numPoints - 1].y) / 2);
+                that.context.fill();
+                that.context.stroke();
+            }
+        }
+    })
+</script>
+</body>
+</html>

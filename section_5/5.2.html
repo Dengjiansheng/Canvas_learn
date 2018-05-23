@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_3</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <div id="app">
+        <canvas id="canvas" width="375" height="400"></canvas>
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/arrow.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            arrow: new Arrow(),
+            canvas: null,
+            speed: 1
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            },
+        },
+        mounted: function () {
+            this.canvas = document.getElementById('canvas');
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+            this.arrow.x = this.canvasWidth/2;
+            this.arrow.y = this.canvasHeight/2;
+            this.drawFrame();
+        },
+        methods: {
+            drawFrame: function () {
+                var dx = this.mouse.x - this.arrow.x,
+                    dy = this.mouse.y - this.arrow.y,
+                    angle = Math.atan2(dy, dx),
+                    vx = Math.cos(angle) * this.speed,
+                    vy = Math.sin(angle) * this.speed;
+                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+                    this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                    this.arrow.rotation = angle;
+                    console.log(`angle: ${angle} \n dx: ${dx} \n dy: ${dy}`)
+                    this.arrow.x += vx;
+                    this.arrow.y += vy;
+                    this.arrow.draw(this.context);
+                }
+                window.requestAnimationFrame(this.drawFrame);
+            }
+        }
+    })
+</script>
+</body>
+</html>

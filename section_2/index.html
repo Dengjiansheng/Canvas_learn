@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>section_2</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <canvas id="canvas" width="375" height="400"></canvas>
+    <div id="app">
+        <p v-show="touch.isPressed">按下</p>
+        <p>{{ touch.x }}</p>
+        <p>{{ touch.y }}</p>
+        <p>{{ mouse.x }}</p>
+        <p>{{ mouse.y }}</p>
+        <p>{{ arrow.rotation*180/Math.PI }}</p>
+    </div>
+<script src="../Javascript/utils.js"></script>
+<script src="../Javascript/arrow.js"></script>
+<script src="../Javascript/vue.js"></script>
+<script>
+    // var canvas = document.getElementById('canvas'),
+    //     context = canvas.getContext('2d'),
+    //     arrow = new Arrow();
+    //     arrow.x = canvas.width / 2;
+    //     arrow.y = canvas.height / 2;
+    // (function drawFrame () {
+    //     window.requestAnimationFrame(drawFrame, canvas);
+    //     context.clearRect(0, 0, canvas.width, canvas.height);
+    //     var dx = mouse.x
+    // })()
+    var app = new Vue({
+        el: '#app',
+        data: {
+            touch: {},
+            mouse: {},
+            canvas: document.getElementById('canvas'),
+            arrow: new Arrow()
+        },
+        computed: {
+            context: function () {
+                return this.canvas.getContext('2d');
+            },
+            canvasWidth: function () {
+                return this.canvas.width;
+            },
+            canvasHeight: function () {
+                return this.canvas.height;
+            }
+        },
+        mounted: function () {
+            this.arrow.x = this.canvasWidth / 2;
+            this.arrow.y = this.canvasHeight / 2;
+            this.touch = utils.captureTouch(canvas);
+            this.mouse = utils.captureMouse(canvas);
+            this.drawFrame();
+        },
+        methods: {
+            drawFrame: function () {
+                var that = this,
+                    dx = that.touch.x - that.arrow.x,
+                    dy = that.touch.y - that.arrow.y;
+                that.context.clearRect(0, 0, that.canvasWidth, that.canvasHeight);
+                that.arrow.rotation = Math.atan2(dy, dx);
+                that.arrow.draw(that.context);
+                dx = dy = null;
+                window.requestAnimationFrame(that.drawFrame, that.canvas);
+            }
+        }
+    })
+</script>
+</body>
+</html>
