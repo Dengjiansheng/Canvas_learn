@@ -1,0 +1,4 @@
+@charset "UTF-8";
+html{background:red;font-family:'Franklin Gothic Medium','Arial Narrow',Arial,sans-serif;-webkit-transform:translate(0,0,20);transform:translate(0,0,20);display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center}
+html body{background:green}
+/*# sourceMappingURL=sourcemap/sass.1.css.map */
